@@ -8,12 +8,28 @@ Selling points:
 
 #### Easy to use:
 ```
+<!-- Add html elements (in this case spans) with the data setup -->
 <span id="graphValues">3,4,5,4,8,2.8,3,10</span><br>
 <span id="graphLabels">Jan,Feb,Mar,Apr,May,Jun,Jul,Aug</span><br>
 <span id="axisTitles">Months, Numbers</span><br>
 
-x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
+<script>
+  //Instanciate the object, initialise and then call one simple function
+  x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
+  x.init();
+  x.makeBarChart();  
+</script>
 ```
+
+#### Easy to customise:
+```
+<!--  -->
+x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
+x.init();
+x.makeBarChart();  //Bar Chart!
+```
+
+
 
 #### Live demo:
 http://codepen.io/dburrell/pen/lGqgi
