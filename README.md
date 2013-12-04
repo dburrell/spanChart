@@ -3,9 +3,15 @@
 Selling points:
 
  * Object oriented - create, edit & destroy graphs programatically
- * HTML5 canvas based - compatible with all major browsers, **no plugins required**
+ * HTML5 canvas based animation - compatible with all major browsers, **no plugins required**
  * Completely customisable - a huge range of customisation options are available for adjustment before drawing.
 
+ 
+ 
+#### Live demo:
+http://codepen.io/dburrell/pen/lGqgi
+ 
+ 
  
 #### Easy to use:
 ```
@@ -53,9 +59,6 @@ Selling points:
 ```
 
 
-#### Live demo:
-http://codepen.io/dburrell/pen/lGqgi
- 
  
 #### Sample screenshot:
 
