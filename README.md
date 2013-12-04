@@ -15,14 +15,16 @@ http://codepen.io/dburrell/pen/lGqgi
  
 #### Easy to use:
 ```
-<!-- Add html elements (in this case spans) with the data setup -->
+<!-- Include the spanChart js file -->
+<script src="spanChart.js"></script>
 
+<!-- Add html elements (in this case spans) with the data setup -->
 <span id="graphValues">3,4,5,4,8,2.8,3,10</span><br>
 <span id="graphLabels">Jan,Feb,Mar,Apr,May,Jun,Jul,Aug</span><br>
 <span id="axisTitles">Months, Numbers</span><br>
 
 <script>
-  //Instanciate the object, initialise and then call one simple function
+  //Instantiate the object, initialise and then call one simple function
   x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
   x.init();
   x.makeBarChart();
