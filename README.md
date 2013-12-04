@@ -66,3 +66,15 @@ http://codepen.io/dburrell/pen/lGqgi
 
 ![ScreenShot](https://raw.github.com/dburrell/spanChart/master/scrshots/barChart.png)
 
+
+
+
+#### Requirements
+Make sure you include jQuery before starting
+
+```html
+<!-- e.g. by pointing to googleapis -->
+<script src="//ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+```
+
+Also depending on your browser requirements you should include prefixfree available at http://leaverou.github.io/prefixfree/
