@@ -31,7 +31,7 @@ Selling points:
   x.init();
 
 
-  //Below are all OPTIONAL attributes
+  //Below are all OPTIONAL attributes. In this case we're building a pie chart.
  
   x.colorStart = '#72A745';	// rustom colour to start with
   x.radius = 100;		// radius of pie chart
@@ -43,7 +43,12 @@ Selling points:
   x.bgEndCol = '#ABA';		// finishing colour for gradient of the background
   x.bgBorderCol = '#000';	// Colour of border
   x.titleColor = '#000';	// Colour of title
+
+
+  //Then simple function to draw (in this case a pie chart)
+
   x.makePieChart();      	// Pie chart!
+ 
 </script>
 ```
 
