@@ -1,0 +1,116 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>Spanchart by dburrell</title>
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="javascripts/main.js"></script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+
+  </head>
+  <body>
+
+      <header>
+        <h1>Spanchart</h1>
+        <p>create graphs &amp; charts using data from simple html elements</p>
+      </header>
+
+      <div id="banner">
+        <span id="logo"></span>
+
+        <a href="https://github.com/dburrell/spanChart" class="button fork"><strong>View On GitHub</strong></a>
+        <div class="downloads">
+          <span>Downloads:</span>
+          <ul>
+            <li><a href="https://github.com/dburrell/spanChart/zipball/master" class="button">ZIP</a></li>
+            <li><a href="https://github.com/dburrell/spanChart/tarball/master" class="button">TAR</a></li>
+          </ul>
+        </div>
+      </div><!-- end banner -->
+
+    <div class="wrapper">
+      <nav>
+        <ul></ul>
+      </nav>
+      <section>
+        <h4>
+<a name="create-graphs--charts-using-data-from-simple-html-elements" class="anchor" href="#create-graphs--charts-using-data-from-simple-html-elements"><span class="octicon octicon-link"></span></a>Create graphs &amp; charts using data from simple html elements</h4>
+
+<p>Selling points:</p>
+
+<ul>
+<li>Object oriented - create, edit &amp; destroy graphs programatically</li>
+<li>HTML5 canvas based - compatible with all major browsers, <strong>no plugins required</strong>
+</li>
+<li>Completely customisable - a huge range of customisation options are available for adjustment before drawing.</li>
+</ul><h4>
+<a name="easy-to-use" class="anchor" href="#easy-to-use"><span class="octicon octicon-link"></span></a>Easy to use:</h4>
+
+<pre><code>&lt;!-- Add html elements (in this case spans) with the data setup --&gt;
+
+&lt;span id="graphValues"&gt;3,4,5,4,8,2.8,3,10&lt;/span&gt;&lt;br&gt;
+&lt;span id="graphLabels"&gt;Jan,Feb,Mar,Apr,May,Jun,Jul,Aug&lt;/span&gt;&lt;br&gt;
+&lt;span id="axisTitles"&gt;Months, Numbers&lt;/span&gt;&lt;br&gt;
+
+&lt;script&gt;
+  //Instanciate the object, initialise and then call one simple function
+  x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
+  x.init();
+  x.makeBarChart();
+&lt;/script&gt;
+</code></pre>
+
+<h4>
+<a name="easy-to-customise" class="anchor" href="#easy-to-customise"><span class="octicon octicon-link"></span></a>Easy to customise:</h4>
+
+<pre><code>&lt;script&gt;
+  x = getSpanChart("Chart Title", "graphValues", "graphLabels", "axisTitles");
+  x.init();
+
+
+  //Below are all OPTIONAL attributes. In this case we're building a pie chart.
+
+  x.colorStart = '#72A745'; // rustom colour to start with
+  x.radius = 100;       // radius of pie chart
+  x.bottom = 630;       // X positioning
+  x.left = -100;        // Y positioning
+  x.totalWidth = 250;       // width (everything scales out) 
+  x.labelDistance = -25;    // distance from pie segment to data label
+  x.bgStartCol = '#9B9';    // starting colour for gradient of the background
+  x.bgEndCol = '#ABA';      // finishing colour for gradient of the background
+  x.bgBorderCol = '#000';   // Colour of border
+  x.titleColor = '#000';    // Colour of title
+
+
+  //Then simple function to draw (in this case a pie chart)
+
+  x.makePieChart();         // Pie chart!
+
+&lt;/script&gt;
+</code></pre>
+
+<h4>
+<a name="live-demo" class="anchor" href="#live-demo"><span class="octicon octicon-link"></span></a>Live demo:</h4>
+
+<p><a href="http://codepen.io/dburrell/pen/lGqgi">http://codepen.io/dburrell/pen/lGqgi</a></p>
+
+<h4>
+<a name="sample-screenshot" class="anchor" href="#sample-screenshot"><span class="octicon octicon-link"></span></a>Sample screenshot:</h4>
+
+<p><img src="https://raw.github.com/dburrell/spanChart/master/scrshots/barChart.png" alt="ScreenShot"></p>
+      </section>
+      <footer>
+        <p>Project maintained by <a href="https://github.com/dburrell">dburrell</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://twitter.com/michigangraham">mattgraham</a></small></p>
+      </footer>
+    </div>
+    <!--[if !IE]><script>fixScale(document);</script><![endif]-->
+    
+  </body>
+</html>
