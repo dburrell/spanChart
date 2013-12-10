@@ -14,11 +14,105 @@
 
 
 
+testFunction();
+
+var a ;
+var b;
+var c;
+var d;
+function testFunction()
+{
+  //A is a barchart, and uses default settings
+  a = getSpanChart("Numbers by month", "graphValues", "graphLabels", "axisTitles");    
+  a.init();  
+  a.makeBarChart();  //Bar Chart!  
+  
+  //B is a donut chart, which is really a pie chart with an inner radius
+  b = getSpanChart("Donut Chart (B)", "graphValues", "graphLabels", "axisTitles");    
+  b.init();
+  b.colorStart = '#72A745';
+  b.radius = 100;
+  b.bottom = 630;
+  b.left = -100;
+  b.totalWidth = 250;
+  b.innerRadius = 50;    //inner radius!
+  b.labelDistance = -25;
+  b.polar = false;
+  b.bgStartCol = '#9B9';
+  b.bgEndCol = '#ABA';
+  b.bgBorderCol = '#000';
+  b.titleColor = '#000';
+  b.makePieChart();      //Pie chart!
+  
+  
+  //C is a pie chart, and has some custom features (set below)
+  c = getSpanChart("Pie Chart (C)", "graphValues", "graphLabels", "axisTitles");    
+  c.init();
+  c.colorStart = '#7245A7';
+  c.radius = 100;
+  c.bottom = 630;
+  c.left = 200;
+  c.totalWidth = 250;
+  c.innerRadius = 0;
+  c.labelDistance = -25;
+  c.bgStartCol = '#B9B';
+  c.bgEndCol = '#BAB';
+  c.bgBorderCol = '#000';
+  c.titleColor = '#000';
+  c.makePieChart();  //Pie chart!
+  
+  
+  //D is a polart chart, which is actually a pie chart but set polar=true
+  d = getSpanChart("Polar Area Chart (D)", "graphValues", "graphLabels", "axisTitles");    
+  d.init();
+  d.colorStart = '#A71122';
+  d.radius = 100;
+  d.bottom = 630;
+  d.left = 500;
+  d.totalWidth = 250;
+  d.innerRadius = 10;
+  d.labelDistance = 30;
+  d.bgStartCol = '#744';
+  d.bgEndCol = '#311';
+  d.bgBorderCol = '#000';
+  d.titleColor = '#FFF';
+  d.growOnEntry = true;
+  d.makePolarChart();        //Polar Chart!
+  
+  
+}
+
+
+function toolTip(x,y,hint)
+{
+  $("#tooltip").remove();
+  
+  var gap = 15;
+  
+  var width = 100;
+  var height= 50;
+  var startCol = "#000";
+  var endCol = "#333";
+  
+  $('body').append("<div id='tooltip' style='left:" + (x + gap) + "px; top:" + (y + gap) + "px; width: " + width +  "px; background: linear-gradient(to bottom, " + startCol + " 0%," + endCol + " 100%); color:#FFF;  border-style: solid; border-width: 1px; border-radius:10px; height:" + height + "px; position:fixed; vertical-align:middle; z-index:1002; text-align:center'><div style='position:relative; margin:auto auto; top:20%;'>" + hint + "</div></div>");  
+  
+  $("#tooltip").mouseover("function(){$('#tooltip').remove();}");
+  
+}
+
+
+function removeToolTip()
+{
+  $('#tooltip').remove();
+}
+
+
+
+//THE FUNCTION
 function getSpanChart(title, id, labelID, axisTitleID)
 {  
   var s = 
-      {
-        
+      {        
         //GENERAL PREFERENCES
         displayValues:true,     // display values
         hideSourceDataBool:true,    // Hide the elements you took the data from
@@ -47,7 +141,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         barBorder:true,         // Should bars have borders
         barBorderColor:'#FFF',  //
         barTransparency:0.9,    //Bar Transparency!
-        
+        barWidth:0,
         
         
         //DATA LABELS
@@ -94,6 +188,10 @@ function getSpanChart(title, id, labelID, axisTitleID)
         axisGrid:true,          // show horizontal lines for axis
         axisGridColor:'#888',   // color of the gridlines
         YAxisSkip:1,            // how many values to skip on Y axis
+        
+        
+        //shape objects
+        shapes:new Array(),
         
         
         //init spanchart
@@ -177,6 +275,118 @@ function getSpanChart(title, id, labelID, axisTitleID)
           return (x/(2*Math.PI))*360; 
         },
         
+                
+        addCanvas: function(y1, y2, x1, x2)
+        {
+          $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + y2 + "px; left:" + x1 + "px;  ' height=" + (y2-y1) + "px width=" + (x2-x1) + "px></canvas>");
+          $("#canvas" + s.ran).click(function(){s.graphClick();});
+          
+        },
+        
+        
+        graphClick: function(event)
+        {                    
+          var x = event.clientX - s.left;
+          var y = s.bottom - event.clientY;
+                    
+          for (var i = 0; i < s.shapes.length; i++)          
+          {
+            if (x >= s.shapes[i].startX && x <= (s.shapes[i].startX + s.barWidth) && y <= s.shapes[i].height)               
+            {
+              alert(i);
+            }  
+          }                    
+        },
+        
+        
+        
+        
+        
+        
+        
+        
+        graphHover: function(event)
+        {   
+          var shapeFound = null;
+          var hintToShow = "";
+          
+          for (var i = 0; i < s.shapes.length; i++)          
+          {
+            var shape = s.shapes[i];
+            
+            //Square
+            if (shape.square === true)
+            {
+              var x = event.clientX - s.left;
+              var y = s.bottom - event.clientY;
+                            
+              if (x >= shape.startX && x <= (shape.startX + s.barWidth)
+                  && y <= shape.height)                 
+              {
+                shapeFound = shape;
+                hintToShow = shape.hint;
+              }
+            }
+            
+            //Triangle (cone...pie)
+            if (shape.tri === true)
+            {
+              var x = event.clientX - (s.left+s.totalWidth);
+              var y = s.bottom - event.clientY;
+              
+              var plusX = Math.max(x,0-x);
+              var plusY = Math.max(y,0-y);
+              
+              var hyp = Math.sqrt((plusX*plusX)+(plusY*plusY));
+              
+              if (hyp < shape.radius && hyp > shape.innerRadius)
+              {
+              
+                var a = 0;
+                if (x > 0 && y > 0)
+                {
+                  //top right
+                  a = 270 + s.r2d((Math.atan(x/y)));    
+                }
+                if (x > 0 && y < 0)
+                {
+                  //bottom right
+                  a = s.r2d((Math.atan((0-y)/x)));    
+                }
+                if (x < 0 && y < 0)
+                {
+                  //bottom left
+                  a = 90 + s.r2d((Math.atan((0-x)/(0-y))));    
+                }
+                if (x < 0 && y > 0)
+                {
+                  //bottom left
+                  a = 180 + s.r2d((Math.atan(y/(0-x))));    
+                }
+              
+                if (a >= shape.angle && a <= shape.angle2)
+                {                
+                  shapeFound = shape;
+                  hintToShow = a;                                    
+                }            
+              }
+            }                        
+          }       
+          
+          if (hintToShow != "")
+          {
+            toolTip(event.clientX,event.clientY, shapeFound.hint);
+          }
+          else
+          {
+            removeToolTip(); 
+          }                             
+        },
+          
+        
+        
+        
+        
         //Add background chart area
         addChartArea: function(left, top, width, height)
         {
@@ -208,7 +418,38 @@ function getSpanChart(title, id, labelID, axisTitleID)
         },
         
         
+        shapeTest: function()
+        {
+          alert(s.shapes.length);
+        },
         
+        addShape: function(shape)
+        {
+          var l = s.shapes.length;
+          s.shapes[l] = shape;
+        },
+        
+        makeShape: function()
+        {          
+          var s = 
+              {
+                square:false,
+                startX:0,
+                startY:0,
+                width:0,
+                height:0,
+                
+                tri:false,
+                angle:0,
+                angle2:0,
+                radius:0,
+                innerRadius:0,
+                
+                hint:""
+              };                                
+          
+          return s;          
+        },
         
         
         //////////////////////////////////////////////
@@ -266,20 +507,23 @@ function getSpanChart(title, id, labelID, axisTitleID)
           //Canvas bits          
           $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
           
+          
+          $("body").append("<canvas id='canvas2" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; z-index:1001; background-color:transparent; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
+          
+          $("#canvas2" + s.ran).mousemove(function(){s.graphHover(event);});
+          $("#canvas2" + s.ran).mouseout(function(){removeToolTip();});
+          
+          
+          
+          
           var canvas = document.getElementById('canvas' + s.ran);  // grab canvas element
           var ctx = canvas.getContext('2d');                       // 2d context of element               
-          s.ctx = ctx;                                             // pass context down to object
+          s.ctx = ctx;      
+          
           s.callMakeSection( new Date().getTime(), canvas);        // recurring function (animation)      
           //canvas.onClick = "alert('test');";
-          $("#canvas"+s.ran).click(function()
-                                   {
-                                     //when you click on canvas
-                                     var x  = (event.clientX - (s.left )) - (s.totalWidth);
-                                     var y = (event.clientY - s.bottom);
-                                     //alert(y + "," + x);
-                                     var a = Math.atan(y/x);
-                                     alert(x + "," + y + "(" + (90-s.r2d(a)) + ")");
-                                   });
+          
+          
         },
         
         //Animation function. Each call draws all the elements up to angle FC
@@ -292,10 +536,13 @@ function getSpanChart(title, id, labelID, axisTitleID)
           var fc = Math.min(360/(s.totalAnimationTime/timeDiff),360);       // big angle at this point
           
           var angleCum = 0;                                                 // start of next object
+          
+          s.shapes = new Array();
           for (var i = 0; i < values.length; i++)
           {                                         
             var sec = s.makeSection(s.ctx, canvas);                         // New section            
             sec.sAngle = angleCum;                                          // Start after last one
+            sec.value = values[i];
             var ratio = 1;
             if (s.growOnEntry)
             {
@@ -347,6 +594,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 tipSize:13,            
                 totalTime:1000,
                 radius:50,
+                value:0,
                 
                 ///////////////////////
                 //Draw
@@ -362,6 +610,17 @@ function getSpanChart(title, id, labelID, axisTitleID)
                   var y2 = (sec.radius * Math.sin(a)) + (s.totalWidth/2);         
                   var innerX = (s.innerRadius * Math.cos(s.d2r(sec.eAngle))) + halfWidth;
                   var innerY = (s.innerRadius * Math.sin(s.d2r(sec.eAngle))) + halfWidth;               
+                  
+                  
+                  //shape management
+                  var shape = s.makeShape();
+                  shape.tri = true;                  
+                  shape.angle = sec.sAngle;
+                  shape.angle2 = sec.eAngle;
+                  shape.radius = sec.radius;
+                  shape.innerRadius = s.innerRadius;
+                  shape.hint = "'" + sec.tip + "': " + sec.value;
+                  s.addShape(shape);
                   
                   
                   //Colouring
@@ -515,6 +774,13 @@ function getSpanChart(title, id, labelID, axisTitleID)
           var padding = 5;
           $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + ((s.bottom - ((s.totalHeight+padding))) ) + "px; left:" + (s.left) + "px; background:rgba(64,64,64,0.0); ' height=" + (s.totalHeight + padding) + "px width=" + s.totalWidth + "px></canvas>");
           
+          
+          //$("#canvas" + s.ran).click(function(){s.graphClick(event);});          
+          $("#canvas" + s.ran).mousemove(function(){s.graphHover(event);});
+          $("#canvas" + s.ran).mouseout(function(){removeToolTip();});
+          
+          //$("#canvas" + s.ran).click(function(){alert("test");});
+          
           var canvas = document.getElementById('canvas' + s.ran);  // grab canvas element
           var ctx = canvas.getContext('2d');                       // 2d context of element               
           
@@ -526,6 +792,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
           ///////////////////////
           values = $('#'+id).text().split(",");                    // Get the values     
           var barWidth = ((s.totalWidth-5) / values.length) - s.gap;   // width of bars                 
+          s.barWidth = barWidth;
           
           for (var i = 0; i < values.length; i++)
           {
@@ -564,12 +831,10 @@ function getSpanChart(title, id, labelID, axisTitleID)
         animateBarsHTML5: function(ctx, canvas, finalHeight, padding, startTime)
         {
           ctx.clearRect(0, 0, canvas.width, canvas.height);            // clear canvas          
-          var values = $('#'+id).text().split(",");                    // Get the values     
+          var values = $('#'+id).text().split(",");                    // Get the values               
+          var xLabels = $('#'+labelID).text().split(",");          // Get the values 
           var topValue = Math.max.apply(Math, values);                 // Find the highest value          
           var barWidth = ((s.totalWidth-5) / values.length) - s.gap;   // width of bars                 
-          
-          
-          
           
           
           
@@ -585,11 +850,17 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           
           
-          
+          ///////////////////////////////////////
+          //Data bars
+          ///////////////////////////////////////
           if (s.showDataBars)
           {
+            //clear shapes made
+            s.shapes = new Array();
+            
             for (var i = 0; i < values.length; i++)
-            {                      
+            { 
+              //Calculations for each bar
               var newID = "chartIDBar" + i + s.ran;
               var val = values[i];               
               var barHeight = (val * pxMult);            
@@ -599,6 +870,19 @@ function getSpanChart(title, id, labelID, axisTitleID)
               var y1 =  s.totalHeight + padding;
               var y2 = y1 - (barHeight);
               
+              
+              //Add to shapes array
+              var newShape = s.makeShape();
+              newShape.square = true;
+              newShape.startX = x1;
+              newShape.startY = y1;
+              newShape.width = barWidth;
+              newShape.height = barHeight;
+              newShape.hint = xLabels[i] + ": " + val;
+              s.addShape(newShape);
+              
+              
+              //Draw in the canvas
               ctx.beginPath();
               ctx.moveTo(x1, y1);
               ctx.lineTo(x1, y2);
@@ -621,7 +905,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           
           
-          
+          ///////////////////////////////////////
+          //Data Lines
+          ///////////////////////////////////////
           if (s.showDataLines)
           {            
             ctx.beginPath();
@@ -694,26 +980,12 @@ function getSpanChart(title, id, labelID, axisTitleID)
           }
           
           
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
-          
+          ///////////////////////////////////////
+          //Curve Lines
+          ///////////////////////////////////////
           if (s.showCurveLines)
           {
-                                    
+            
             if (s.shadeUnder)
             {              
               ctx.beginPath();    
@@ -730,7 +1002,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
               
               if (!s.shadeUnder)
               {
-                 ctx.beginPath();
+                ctx.beginPath();
               }
               
               if (i > 0)
@@ -745,7 +1017,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 
                 if (!s.shadeUnder)
                 {
-                ctx.moveTo(x1, y1);
+                  ctx.moveTo(x1, y1);
                 }
                 ctx.bezierCurveTo(x2-(barWidth/2), y1, x2-(barWidth/2), y2, x2, y2);
                 
