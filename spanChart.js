@@ -286,6 +286,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         
         graphClick: function(event)
         {                    
+          event = event || window.event;
           var x = event.clientX - s.left;
           var y = s.bottom - event.clientY;
                     
@@ -301,12 +302,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
         
         
         
-        
-        
-        
-        
-        graphHover: function(event)
+        graphHover: function(passedY, passedX)
         {   
+        
           var shapeFound = null;
           var hintToShow = "";
           
@@ -317,8 +315,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
             //Square
             if (shape.square === true)
             {
-              var x = event.clientX - s.left;
-              var y = s.bottom - event.clientY;
+              var x = passedX - s.left;
+              var y = s.bottom - passedY;
                             
               if (x >= shape.startX && x <= (shape.startX + s.barWidth)
                   && y <= shape.height)                 
@@ -331,8 +329,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
             //Triangle (cone...pie)
             if (shape.tri === true)
             {
-              var x = event.clientX - (s.left+s.totalWidth);
-              var y = s.bottom - event.clientY;
+              var x = passedX - (s.left+s.totalWidth);
+              var y = s.bottom - passedY;
               
               var plusX = Math.max(x,0-x);
               var plusY = Math.max(y,0-y);
@@ -375,14 +373,14 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           if (hintToShow != "")
           {
-            toolTip(event.clientX,event.clientY, shapeFound.hint);
+            toolTip(passedX,passedY, shapeFound.hint);
           }
           else
           {
             removeToolTip(); 
           }                             
         },
-          
+        
         
         
         
@@ -510,7 +508,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           $("body").append("<canvas id='canvas2" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; z-index:1001; background-color:transparent; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
           
-          $("#canvas2" + s.ran).mousemove(function(){s.graphHover(event);});
+          //$("#canvas2" + s.ran).mousemove(function(){s.graphHover(this,event);});
+          
+          $("#canvas2" + s.ran).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
           $("#canvas2" + s.ran).mouseout(function(){removeToolTip();});
           
           
@@ -764,7 +764,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
             }
             
             //Title
-            $('body').append("<div class='spanChartYAxisTitle childOf" + s.ran + "' style='left:" + (s.left - (s.totalHeight/2) - s.axisHPadding - 40 ) + "px; top:" + (s.bottom-s.totalHeight)  + "px; height:20px; text-align:center; font-weight:bold; width:" + s.totalHeight + "px; color:" + s.axisFontColor + "; z-index:100; transform: rotate(90deg) translate(" + s.totalHeight/2 + "px, 0px); position:fixed;'>" + axisTitles[1] + "</div>");      
+            $('body').append("<div id='yAxis" + s.ran + "' class='spanChartYAxisTitle childOf" + s.ran + "' style='left:" + (s.left - (s.totalHeight/2) - s.axisHPadding - 40 ) + "px; top:" + (s.bottom-s.totalHeight)  + "px; height:20px; text-align:center; font-weight:bold; width:" + s.totalHeight + "px; color:" + s.axisFontColor + "; z-index:100; transform: rotate(90deg) translate(" + s.totalHeight/2 + "px, 0px); position:fixed;'>" + axisTitles[1] + "</div>");    
+            
             
             
           }
@@ -776,7 +777,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           
           //$("#canvas" + s.ran).click(function(){s.graphClick(event);});          
-          $("#canvas" + s.ran).mousemove(function(){s.graphHover(event);});
+          //$("#canvas" + s.ran).mousemove(function(){s.graphHover(this.event);});
+          $("#canvas" + s.ran).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
           $("#canvas" + s.ran).mouseout(function(){removeToolTip();});
           
           //$("#canvas" + s.ran).click(function(){alert("test");});
