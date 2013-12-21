@@ -1,0 +1,41 @@
+<html>
+  <head>    
+    <style>
+      body
+      {
+	background-color:#333;	/* I just like this background colour */
+      }
+    </style>
+  </head>
+  
+  <body>
+    
+    <!--Reference jQuery-->
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.10.2/jquery.min.js"></script>
+    
+    <!--Reference spanChart-->
+    <script src="spanChart.js"></script>
+
+
+    <!--The raw data-->
+    <span id="graphValues">3,4,5,4,8,2.8,3,10</span><br>
+    <span id="graphLabels">Jan,Feb,Mar,Apr,May,Jun,Jul,Aug</span><br>
+    <span id="axisTitles">Months, Numbers</span><br>
+
+    <!--Call spanChart functions with Javascript-->
+    <script>
+      
+      //Make a spanChart object
+      a = getSpanChart("Numbers by month", "graphValues", "graphLabels", "axisTitles");    
+      
+      //Instantiate with data
+      a.init();  
+      
+      //Draw a bar chart on screen
+      a.makeBarChart();  
+
+    </script>
+        
+  </body>
+
+</html>
