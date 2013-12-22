@@ -3,7 +3,7 @@
     <style>
       body
       {
-	background-color:#333;	/* I just like this background colour */
+	background-color:#000;	/* I just like this background colour */
       }
     </style>
 
@@ -13,26 +13,37 @@
     <!--Reference spanChart-->
     <script src="spanChart.js"></script>
 
+    <!--Reference prefixFree (from http://leaverou.github.io/prefixfree/)-->
+    <script src="prefixfree.min.js"></script>
+
+
+    
     <!--Reference (optional) spanChart CSS -->
     <link rel="stylesheet" type="text/css" href="spanChart.css">
+    
+    
     
   </head>
   
   <body>
    
     <!--The raw data-->
-    <span id="graphValues">3,4,5,4,8,2.8,3,10</span><br>
-    <span id="graphLabels">Jan,Feb,Mar,Apr,May,Jun,Jul,Aug</span><br>
-    <span id="axisTitles">Months, Numbers</span><br>
+    <span id="graphValues">78,520,433,371</span><br>
+    <span id="graphLabels">The Terminator,Terminator 2,Terminator 3,Terminator 4</span><br>
+    <span id="axisTitles">, Box Office Spend ($M)</span><br>
 
     <!--Call spanChart functions with Javascript-->
     <script>
       
       //Make a spanChart object
-      a = getSpanChart("Numbers by month", "graphValues", "graphLabels", "axisTitles");    
+      a = getSpanChart("Box Office spend ($M) for Terminator series", "graphValues", "graphLabels", "axisTitles");    
       
       //Instantiate with data
       a.init();  
+      
+      a.YAxisSkip = 100;
+      a.YAxisLabelWidth = 30;
+      a.axisYSize = 50;
       
       //Draw a bar chart on screen
       a.makeBarChart();  

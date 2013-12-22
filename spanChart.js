@@ -1,18 +1,3 @@
-//CLASSES AVAILABLE FOR FURTHER CUSTOMISATION:
-//'graphBar'             - the bars
-//'spanChartLabel'       - data labels
-//'spanChartYAxisValue'  - Y axis values
-//'spanChartXAxisValue'  - X axis values
-//'spanChartYAxisTitle'  - X axis title
-//'spanChartXAxisTitle'  - Y axis title
-//'spanChartTitle'       - the chart title
-
-//Example use:
-//a = getSpanChart("Curve Graph", "graphValues", "graphLabels", "axisTitles");    
-//a.init();
-//a.makeCurveChart();
-
-
 function toolTip(x,y,hint)
 {
   $("#tooltip").remove();
@@ -51,6 +36,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         
         
         //POSITIONING
+        anchorObject:"",        // an object to anchor to
         totalHeight:200,        // height
         totalWidth:500,         // width
         bottom:370,             // Y offset
@@ -118,6 +104,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         axisGrid:true,          // show horizontal lines for axis
         axisGridColor:'#888',   // color of the gridlines
         YAxisSkip:1,            // how many values to skip on Y axis
+        YAxisLabelWidth:20,
         
         
         //shape objects
@@ -425,7 +412,14 @@ function getSpanChart(title, id, labelID, axisTitleID)
         //Make the pie chart
         ///////////////////////////////////
         makePieChart: function()
-        {          
+        {                    
+          if (s.anchorObject != "")
+          {
+            s.bottom = $("#" + s.anchorObject).position().top + (s.totalWidth/2) + 30;
+            
+            s.left = $("#" + s.anchorObject).position().left - (s.totalWidth/2);
+          }
+          
           //Chart Area     
           s.addChartArea((s.left+(s.totalWidth/2)), (s.bottom-(s.totalWidth/2)-30), s.totalWidth, s.totalWidth+30);          
           
@@ -620,6 +614,15 @@ function getSpanChart(title, id, labelID, axisTitleID)
           var topValue = Math.max.apply(Math, values);             // Find the highest value
           s.hideSourceData();                                      //Hide the data
           
+          
+          if (s.anchorObject != "")
+          {
+            s.bottom = $("#" + s.anchorObject).position().top + s.totalHeight + (s.bgVPadding/2) ;
+            
+            s.left =  $("#" + s.anchorObject).position().left + (s.axisHPadding + s.axisYSize + s.bgHPadding)/2 ; 
+            
+          }
+          
           ///////////////////////
           //Add Chart Area
           ///////////////////////
@@ -685,7 +688,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
             //Values
             for (var Yi = 0; Yi <= topValue; Yi += s.YAxisSkip)
             {
-              $('body').append("<div class='spanChartYAxisValue childOf" + s.ran + "' style='left:" + (s.left - s.axisHPadding - 20) + "px; top:" + (s.bottom - 10 - (s.totalHeight/topValue)*Yi) + "px; color:" + s.axisFontColor + "; width: 1px; z-index:100; position:fixed;'>" + Yi + "</div>");      
+              $('body').append("<div class='spanChartYAxisValue childOf" + s.ran + "' style='left:" + (s.left - s.axisHPadding - s.YAxisLabelWidth) + "px; top:" + (s.bottom - 10 - (s.totalHeight/topValue)*Yi) + "px; color:" + s.axisFontColor + "; width: 1px; z-index:100; position:fixed;'>" + Yi + "</div>");      
               
               if (s.axisGrid)
               {        
@@ -694,7 +697,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
             }
             
             //Title
-            $('body').append("<div id='yAxis" + s.ran + "' class='spanChartYAxisTitle childOf" + s.ran + "' style='left:" + (s.left - (s.totalHeight/2) - s.axisHPadding - 40 ) + "px; top:" + (s.bottom-s.totalHeight)  + "px; height:20px; text-align:center; font-weight:bold; width:" + s.totalHeight + "px; color:" + s.axisFontColor + "; z-index:100; transform: rotate(90deg) translate(" + s.totalHeight/2 + "px, 0px); position:fixed;'>" + axisTitles[1] + "</div>");    
+            $('body').append("<div id='yAxis" + s.ran + "' class='spanChartYAxisTitle childOf" + s.ran + "' style='left:" + (s.left - (s.totalHeight/2) - s.axisHPadding - s.YAxisLabelWidth - 20) + "px; top:" + (s.bottom-s.totalHeight)  + "px; height:20px; text-align:center; font-weight:bold; width:" + s.totalHeight + "px; color:" + s.axisFontColor + "; z-index:100; transform: rotate(90deg) translate(" + s.totalHeight/2 + "px, 0px); position:fixed;'>" + axisTitles[1] + "</div>");    
             
             
             
