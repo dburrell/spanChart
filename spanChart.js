@@ -9,7 +9,7 @@ function toolTip(x,y,hint)
   var startCol = "#000";
   var endCol = "#333";
   
-  $('body').append("<div id='tooltip' style='left:" + (x + gap) + "px; top:" + (y + gap) + "px; width: " + width +  "px; background: linear-gradient(to bottom, " + startCol + " 0%," + endCol + " 100%); color:#FFF;  border-style: solid; border-width: 1px; border-radius:10px; height:" + height + "px; position:fixed; vertical-align:middle; z-index:1002; text-align:center'><div style='position:relative; margin:auto auto; top:20%;'>" + hint + "</div></div>");  
+  $('body').append("<div id='tooltip' style='left:" + (x + gap) + "px; top:" + (y + gap) + "px; width: " + width +  "px; background: linear-gradient(to bottom, " + startCol + " 0%," + endCol + " 100%); color:#FFF;  border-style: solid; border-width: 1px; border-radius:10px; height:" + height + "px; position:absolute; vertical-align:middle; z-index:1002; text-align:center'><div style='position:relative; margin:auto auto; top:20%;'>" + hint + "</div></div>");  
   
   $("#tooltip").mouseover("function(){$('#tooltip').remove();}");
   
@@ -67,6 +67,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         hintID:"graphLabels",   // hint text (e.g. in a pie chart)
         labelDistance:60,
         labelColor:'#FFF',
+	tipLineColor:"",	// Color of the line pointing to data labels
         
         //BACKGROUND
         showBackground:true,    // Show a background        
@@ -77,6 +78,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
         bgHPadding:130,         // As above
         bgBorderCol:'#FFF',
         
+	//CANVAS
+	canvas:"",	
         
         //LINE CHART
         showDataLines:false,    //For bar charts, show lines
@@ -94,7 +97,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         //AXIS
         showAxis:true,          // Show axis at all
         axisColor:'#FFF',       // Color of the axis
-        axisLabels:true,        // Show axis values
+        axisLabels:true,        // Show axis values	
         axisHPadding:30,        // Distance from the bars
         axisVPadding:1,         // Distance from the bars
         axisXSize:40,           // Height of X-Axis
@@ -195,7 +198,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 
         addCanvas: function(y1, y2, x1, x2)
         {
-          $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + y2 + "px; left:" + x1 + "px;  ' height=" + (y2-y1) + "px width=" + (x2-x1) + "px></canvas>");
+          $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:absolute; top:" + y2 + "px; left:" + x1 + "px;  ' height=" + (y2-y1) + "px width=" + (x2-x1) + "px></canvas>");
           $("#canvas" + s.ran).click(function(){s.graphClick();});
           
         },
@@ -220,8 +223,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         
         
         graphHover: function(passedY, passedX)
-        {   
-        
+        {           
           var shapeFound = null;
           var hintToShow = "";
           
@@ -231,10 +233,10 @@ function getSpanChart(title, id, labelID, axisTitleID)
             
             //Square
             if (shape.square === true)
-            {
+            {	      
               var x = passedX - s.left;
               var y = s.bottom - passedY;
-                            
+	      
               if (x >= shape.startX && x <= (shape.startX + s.barWidth)
                   && y <= shape.height)                 
               {
@@ -245,9 +247,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
             
             //Triangle (cone...pie)
             if (shape.tri === true)
-            {
-              var x = passedX - (s.left+s.totalWidth);
-              var y = s.bottom - passedY;
+            {	      
+              var x = Number(passedX) - (Number(s.left) + Number(s.totalWidth));
+              var y = s.bottom - (passedY*1);
               
               var plusX = Math.max(x,0-x);
               var plusY = Math.max(y,0-y);
@@ -278,7 +280,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
                   //bottom left
                   a = 180 + s.r2d((Math.atan(y/(0-x))));    
                 }
-              
+             
                 if (a >= shape.angle && a <= shape.angle2)
                 {                
                   shapeFound = shape;
@@ -307,7 +309,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         {
           if (s.showBackground)
           {
-            $('body').append("<div class='spanChartChartArea childOf" + s.ran + "' id='spanChartChartArea'"+s.ran+"' style='left:" + (left) + "px; top:" + top + "px; width: " + width +  "px; z-index:-100; background: linear-gradient(to bottom, " + s.bgStartCol + " 0%," + s.bgEndCol + " 100%);  border-style: solid; border-width: 1px; border-color: " + s.bgBorderCol + "; border-radius:20px; height:" + height + "px; position:fixed;'></div>");  
+            $('body').append("<div class='spanChartChartArea childOf" + s.ran + "' id='spanChartChartArea'"+s.ran+"' style='left:" + (left) + "px; top:" + top + "px; width: " + width +  "px; z-index:-100; background: linear-gradient(to bottom, " + s.bgStartCol + " 0%," + s.bgEndCol + " 100%);  border-style: solid; border-width: 1px; border-color: " + s.bgBorderCol + "; border-radius:20px; height:" + height + "px; position:absolute;'></div>");  
           }
         },
         
@@ -328,7 +330,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
         
         addDiv: function(newID, newClass, ran, left, top, width, height, color, bgColor, innerText)
         {
-          $('body').append("<div id='" + newID + "'; class='" + newClass + " childOf" + ran + "' style='left:" + left + "px; top:" + top + "px; color:" + color + "; background-color:" + bgColor + ";  width: " + width + "px; height: " + height + "px; position:fixed;  text-align:center;'>" + innerText + "</div>");
+          $('body').append("<div id='" + newID + "'; class='" + newClass + " childOf" + ran + "' style='left:" + left + "px; top:" + top + "px; color:" + color + "; background-color:" + bgColor + ";  width: " + width + "px; height: " + height + "px; position:absolute;  text-align:center;'>" + innerText + "</div>");
           
         },
         
@@ -372,12 +374,36 @@ function getSpanChart(title, id, labelID, axisTitleID)
         //////////////////////////////////////////////
         makePolarChart: function()
         { 
-          s.polar = true;          // polar = true
-          s.makePieChart();
+          s.polar = true;    
+          s.innerRadius = 20;
+          s.makePieChartOptions();
         },
         
-        
-        
+        makePieChart: function()
+	{
+	  s.polar = false;
+	  s.innerRadius = 0;  
+	  s.makePieChartOptions();
+	},
+	
+	makeDonutChart: function()
+	{
+	  s.polar = false;
+	  s.innerRadius = 20;
+	  s.makePieChartOptions();
+	},
+	  
+
+	
+	makeBarChart: function()
+	{
+	  s.showDataLines = false;
+	  s.showDataBars = true;
+	  s.showCurveLines = false;
+	  s.makeBarChartOptions();
+	},
+	
+	
         //////////////////////////////////////////////
         //Line Chart
         //////////////////////////////////////////////
@@ -386,7 +412,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
           s.showDataLines = true;
           s.showDataBars = false;
           s.showCurveLines = false;
-          s.makeBarChart();
+          s.makeBarChartOptions();
         },
         
         
@@ -399,7 +425,7 @@ function getSpanChart(title, id, labelID, axisTitleID)
           s.showDataLines = false;
           s.showDataBars = false;
           s.showCurveLines = true;
-          s.makeBarChart();
+          s.makeBarChartOptions();
         },
         
         
@@ -411,42 +437,54 @@ function getSpanChart(title, id, labelID, axisTitleID)
         ///////////////////////////////////
         //Make the pie chart
         ///////////////////////////////////
-        makePieChart: function()
+        makePieChartOptions: function()
         {                    
           if (s.anchorObject != "")
           {
-            s.bottom = $("#" + s.anchorObject).position().top + (s.totalWidth/2) + 30;
-            
-            s.left = $("#" + s.anchorObject).position().left - (s.totalWidth/2);
+            s.bottom = $("#" + s.anchorObject).offset().top + (s.totalWidth/2) + 30;            
+            s.left = $("#" + s.anchorObject).offset().left - (s.totalWidth/2);
           }
           
           //Chart Area     
           s.addChartArea((s.left+(s.totalWidth/2)), (s.bottom-(s.totalWidth/2)-30), s.totalWidth, s.totalWidth+30);          
           
-          //Title
-          s.addDiv("chartIdTitle" + s.ran, "spanChartTitle", s.ran, (s.left + (s.totalWidth/2)), ((s.bottom - (s.totalHeight/2)) - 40), s.totalWidth , 0, s.titleColor, '#F00', title);
+          //Title (COMMENTED 24-Dec-2013)
+          //s.addDiv("chartIdTitle" + s.ran, "spanChartTitle", s.ran, (s.left + (s.totalWidth/2)), ((s.bottom - (s.totalHeight/2)) - 40), s.totalWidth , 0, s.titleColor, '#F00', title);
           
+	  	  
+	  
           //Canvas bits          
-          $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
-          
-          
-          $("body").append("<canvas id='canvas2" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; z-index:1001; background-color:transparent; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
-          
-          //$("#canvas2" + s.ran).mousemove(function(){s.graphHover(this,event);});
-          
-          $("#canvas2" + s.ran).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
-          $("#canvas2" + s.ran).mouseout(function(){removeToolTip();});
-          
-          
-          
-          
-          var canvas = document.getElementById('canvas' + s.ran);  // grab canvas element
-          var ctx = canvas.getContext('2d');                       // 2d context of element               
-          s.ctx = ctx;      
-          
-          s.callMakeSection( new Date().getTime(), canvas);        // recurring function (animation)      
-          //canvas.onClick = "alert('test');";
-          
+	  if (s.canvas == "") 
+	  {
+	    s.canvas = 'canvas' + s.ran;	    
+	  	  
+	    $("body").append("<canvas id='" + s.canvas + "' class='childOf" + s.ran + "' style='position:absolute; top:" + (s.bottom - (s.totalWidth/2)) + "px; left:" + (s.left+(s.totalWidth/2)) + "px;  ' height=" + s.totalWidth + "px width=" + s.totalWidth + "px></canvas>");
+	
+	  }
+	  else
+	  {	    
+	    var canvasWidth = $("#" + s.canvas).css("width").replace("px","");
+	    s.totalWidth = canvasWidth;	   
+	    s.totalHeight = canvasWidth;
+	    
+	    var canvasTop = $("#" + s.canvas).offset().top;
+	    var canvasLeft = $("#" + s.canvas).offset().left - canvasWidth/2;
+	    	    	    	    	    
+	    s.bottom = (canvasWidth/2) + (canvasTop*1);	    	    
+	    s.left = canvasLeft; 
+	  }
+	  
+	  
+	  //Mouse detection
+	  $("#" + s.canvas).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
+	  $("#" + s.canvas).mouseout(function(){removeToolTip();});
+		  
+	  var canvas = document.getElementById(s.canvas);  // grab canvas element
+	  var ctx = canvas.getContext('2d');                       // 2d context of element               
+          s.ctx = ctx;                
+	  s.ctx.translate(0.5, 0.5)
+          s.callMakeSection( new Date().getTime(), canvas);        // recurring function (animation)                         
+                    
           
         },
         
@@ -454,6 +492,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
         callMakeSection: function(startingTime, canvas)
         {
           s.ctx.clearRect(0, 0, canvas.width, canvas.height);               // clear canvas
+	  s.ctx.webkitImageSmoothingEnabled = true;
+	  s.ctx.imageSmoothingEnabled = true;
           var values = s.getData();                                         // graph the data
           
           var timeDiff = (new Date().getTime() - startingTime) ;            // duration so far     
@@ -482,7 +522,8 @@ function getSpanChart(title, id, labelID, axisTitleID)
               angleCum += (fc / s.getArraySum(values)) * values[i];         // increase angle sum       
               sec.radius = ratio * s.radius;
             }
-            sec.tipColor = s.labelColor;
+           
+	    sec.tipColor = s.labelColor;
             sec.eAngle = angleCum ;                                         // set end angle       
             sec.col1 = s.colorDecrease(s.colorStart, 40, values.length,i, s.barTransparency);  //
             sec.col2 = sec.col1;                                            // no inner gradient 
@@ -528,8 +569,10 @@ function getSpanChart(title, id, labelID, axisTitleID)
                   //Maths        
                   var a = s.d2r(sec.sAngle + ((sec.eAngle - sec.sAngle) / 2));
                   var halfWidth = s.totalWidth/2;
-                  var labelX = ((sec.radius + s.labelDistance) * Math.cos(a)) + halfWidth + s.left + halfWidth;
-                  var labelY = ((sec.radius + s.labelDistance) * Math.sin(a)) + halfWidth + s.bottom - halfWidth;
+                  var labelX = ((sec.radius + s.labelDistance) * Math.cos(a)) + halfWidth ;
+                  var labelY = ((sec.radius + s.labelDistance) * Math.sin(a)) + halfWidth ;
+		  
+		  //alert(labelY + "," + labelX);
                   var x2 = (s.radius * Math.cos(a)) + (s.totalWidth/2);
                   var y2 = (sec.radius * Math.sin(a)) + (s.totalWidth/2);         
                   var innerX = (s.innerRadius * Math.cos(s.d2r(sec.eAngle))) + halfWidth;
@@ -564,11 +607,17 @@ function getSpanChart(title, id, labelID, axisTitleID)
                   ctx.stroke();        
                   ctx.fill();
                   
+		  
+		  
                   //Add Tips
                   if (sec.tip !== "")
                   {
-                    $("body").append("<div class='tooltip childOf" + s.ran + "' style='position:fixed; top:" + labelY + "px; left:" + labelX + "px; color:" + sec.tipColor + "; font-family:" + sec.tipFont + "; font-size:" + sec.tipSize + "px; text-align:center; width:100px; margin-left:-50px; margin-top:-5px; display:none'>" + sec.tip + "</div>");         
-                    var gap = 15;
+		    ctx.fillStyle = sec.tipColor;
+		    ctx.textAlign = 'center';
+		    ctx.font = sec.tipSize + "px " + sec.tipFont;
+		    ctx.fillText(sec.tip, labelX , labelY); 
+		    
+		    var gap = 15;
                     
                     if (s.labelDistance > 0)
                     {
@@ -579,14 +628,31 @@ function getSpanChart(title, id, labelID, axisTitleID)
                       ctx.beginPath();
                       ctx.moveTo(lineX, lineY);
                       ctx.lineTo(lineX2,lineY2);
-                      ctx.strokeStyle = s.tipColor;         
+		      if (s.tipLineColor == "")
+		      {
+			ctx.strokeStyle = s.tipColor;         
+		      }
+		      else
+		      {
+			ctx.strokeStyle = s.tipLineColor;         
+		      }
+		      
                       ctx.stroke();         
                     }
-                    
-                    $('.tooltip.childOf' + s.ran ).fadeIn('slow'); 
-                  }
-                  
-                }};
+                                        
+                    $('.tooltip.childOf' + s.ran ).css("display","block");
+                    $('.tooltip.childOf' + s.ran ).animate({opacity: 1});
+		    
+		    //Title
+		    //ADDED 24-Dec-2013		        		    
+		    ctx.fillStyle = s.titleColor;
+		    ctx.textAlign = 'center';
+		    ctx.font = s.tipSize + "px " + s.tipFont;
+		    ctx.fillText(title, Number(s.totalWidth/2), 20);
+
+                  }            
+                }		
+	      };
           return sec;
         },
         
@@ -607,20 +673,19 @@ function getSpanChart(title, id, labelID, axisTitleID)
         //Make Bar Chart
         //////////////////////////////////////////////
         
-        makeBarChart: function()
-        {
+        makeBarChartOptions: function()
+        {	  
+	
+	  
           var values = $('#'+id).text().split(",");                // Get the values     
-          var axisTitles = $('#'+ axisTitleID).text().split(",");  // Get the values 
+          
           var topValue = Math.max.apply(Math, values);             // Find the highest value
-          s.hideSourceData();                                      //Hide the data
-          
-          
-          if (s.anchorObject != "")
-          {
-            s.bottom = $("#" + s.anchorObject).position().top + s.totalHeight + (s.bgVPadding/2) ;
-            
-            s.left =  $("#" + s.anchorObject).position().left + (s.axisHPadding + s.axisYSize + s.bgHPadding)/2 ; 
-            
+          s.hideSourceData();                                      // Hide the data
+                    
+	  if (s.anchorObject != "")
+          {	    
+            s.bottom = $("#" + s.anchorObject).offset().top + s.totalHeight + (s.bgVPadding/2) ;            
+            s.left =  $("#" + s.anchorObject).offset().left + (s.axisHPadding + s.axisYSize + s.bgHPadding)/2 ; 	                
           }
           
           ///////////////////////
@@ -641,120 +706,42 @@ function getSpanChart(title, id, labelID, axisTitleID)
           }
           
           
-          ///////////////////////
-          // Title
-          ///////////////////////  
-          s.addDiv("chartTitle" + s.ran, "spanChartTitle", s.ran, s.left, (s.bottom - s.totalHeight - 45), s.totalWidth, 0, s.titleColor, 'transparent', title);
-          
-          
-          ///////////////////////
-          // X-Axis
-          ///////////////////////  
-          if (s.showAxis)
-          {    
-            //Line
-            s.addDiv("spanChartAxis" + s.ran, "spanChartAxis", s.ran, s.left, (s.bottom + s.axisVPadding), (s.totalWidth-s.gap) , "1", "#FFF", s.axisColor, "");
-            
-            //Values    
-            var xLabels = $('#'+labelID).text().split(",");          // Get the values    
-            for (var Xi = 0; Xi < xLabels.length; Xi++)
-            {      
-              var orientation = "text-align:center;";
-              var topVal = (s.bottom + s.axisVPadding + 10);
-              if (s.axisXturn90)
-              {
-                orientation = "text-align:left; transform: rotate(90deg);";
-                topVal += s.axisVPadding;
-              }
-              
-              $('body').append("<div class='spanChartXAxisValue childOf" + s.ran + "' style='left:" + (s.left + Xi*(s.totalWidth/xLabels.length)) + "px; top:" + topVal + "px; color:" + s.axisFontColor + "; width: " + ((s.totalWidth/xLabels.length)) + "px;  z-index:100; position:fixed;" + orientation + "'>" + xLabels[Xi] + "</div>");      
-              
-            }
-            
-            //Title
-            $('body').append("<div class='spanChartXAxisTitle childOf" + s.ran + "' style='left:" + s.left + "px; top:" + (s.bottom + s.axisHPadding + 10)  + "px; text-align:center; vertical-align:center; font-weight:bold; color:" + s.axisFontColor + "; width: " + s.totalWidth + "px;  z-index:100; position:fixed;'>" + axisTitles[0] + "</div>");      
-            
-          }
-          
-          
-          ///////////////////////
-          // Y-Axis
-          ///////////////////////
-          if (s.showAxis)
-          {
-            //Line
-            $('body').append("<div class='spanChartAxis childOf" + s.ran + "' id='spanChartYAxis'+s.ran style='left:" + (s.left - s.axisHPadding) + "px; top:" + (s.bottom - s.totalHeight) + "px; width: 1px; z-index:100; background-color:" + s.axisColor + "; height:" + s.totalHeight + "px; position:fixed;'></div>");
-            
-            //Values
-            for (var Yi = 0; Yi <= topValue; Yi += s.YAxisSkip)
-            {
-              $('body').append("<div class='spanChartYAxisValue childOf" + s.ran + "' style='left:" + (s.left - s.axisHPadding - s.YAxisLabelWidth) + "px; top:" + (s.bottom - 10 - (s.totalHeight/topValue)*Yi) + "px; color:" + s.axisFontColor + "; width: 1px; z-index:100; position:fixed;'>" + Yi + "</div>");      
-              
-              if (s.axisGrid)
-              {        
-                $('body').append("<div class='spanChartGrid childOf" + s.ran + "' style='left:" + s.left + "px; top:" + (s.bottom - (s.totalHeight/topValue)*Yi)  + "px; height:1px; width:" + (s.totalWidth - s.gap) + "px; background-color:" + s.axisGridColor + "; position:fixed;'></div>");              
-              }
-            }
-            
-            //Title
-            $('body').append("<div id='yAxis" + s.ran + "' class='spanChartYAxisTitle childOf" + s.ran + "' style='left:" + (s.left - (s.totalHeight/2) - s.axisHPadding - s.YAxisLabelWidth - 20) + "px; top:" + (s.bottom-s.totalHeight)  + "px; height:20px; text-align:center; font-weight:bold; width:" + s.totalHeight + "px; color:" + s.axisFontColor + "; z-index:100; transform: rotate(90deg) translate(" + s.totalHeight/2 + "px, 0px); position:fixed;'>" + axisTitles[1] + "</div>");    
-            
-            
-            
-          }
-          
-          
           //Canvas bits          
           var padding = 5;
-          $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:fixed; top:" + ((s.bottom - ((s.totalHeight+padding))) ) + "px; left:" + (s.left) + "px; background:rgba(64,64,64,0.0); ' height=" + (s.totalHeight + padding) + "px width=" + s.totalWidth + "px></canvas>");
           
+	  if (s.canvas == "")
+	  {	    
+	    $("body").append("<canvas id='canvas" + s.ran + "' class='childOf" + s.ran + "' style='position:absolute; top:" + ((s.bottom - ((s.totalHeight + padding))) ) + "px; left:" + (s.left) + "px; background:rgba(64,64,64,0.0); ' height=" + (s.totalHeight + padding) + "px width=" + s.totalWidth + "px></canvas>");
+	    
+	    s.canvas = "canvas" + s.ran;
+	  }
+	  else
+	  {
+	    var canvasWidth = $("#" + s.canvas).css("width").replace("px","");
+	    var canvasHeight = $("#" + s.canvas).css("height").replace("px","");
+	    s.totalWidth = canvasWidth;
+	    s.totalHeight = canvasHeight;
+	    
+	    var canvasTop = $("#" + s.canvas).offset().top;
+	    var canvasLeft = $("#" + s.canvas).offset().left;
+	    	    	    	    	    
+	    s.bottom = Number(canvasHeight) + Number(canvasTop);	    	    
+	    s.left = Number(canvasLeft);  
+	  }
+	  
+	            
+          $("#" + s.canvas).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
+          $("#" + s.canvas).mouseout(function(){removeToolTip();});
           
-          //$("#canvas" + s.ran).click(function(){s.graphClick(event);});          
-          //$("#canvas" + s.ran).mousemove(function(){s.graphHover(this.event);});
-          $("#canvas" + s.ran).mousemove(function() {var e=arguments[0] ; s.graphHover(e.pageY,e.pageX);});
-          $("#canvas" + s.ran).mouseout(function(){removeToolTip();});
+          var canvas = document.getElementById(s.canvas);  // grab canvas element
+          var ctx = canvas.getContext('2d');               // 2d context of element               
           
-          //$("#canvas" + s.ran).click(function(){alert("test");});
-          
-          var canvas = document.getElementById('canvas' + s.ran);  // grab canvas element
-          var ctx = canvas.getContext('2d');                       // 2d context of element               
-          
+          //ANIMATE
           s.animateBarsHTML5(ctx, canvas, s.totalHeight, padding, new Date().getTime());
           
           
-          ///////////////////////
-          //Data labels
-          ///////////////////////
-          values = $('#'+id).text().split(",");                    // Get the values     
-          var barWidth = ((s.totalWidth-5) / values.length) - s.gap;   // width of bars                 
-          s.barWidth = barWidth;
           
-          for (var i = 0; i < values.length; i++)
-          {
-            var val = values[i]; 
-            var pxMult = s.totalHeight/topValue;                     // Pixel Multiplier                      
-            var barHeight = (val * pxMult);            
-            var textToDisplay = "";
-            
-            var newID = "chartID" + i + s.ran;
-            if (s.displayValues) 
-            { 
-              textToDisplay = val;
-              var labelLeft = ((s.left + (i*barWidth) + (i*s.gap))+s.labelXOffset);
-              var labelTop = ((s.bottom - barHeight) + s.labelYOffset);
-              
-              $('body').append("<div class='spanChartLabel childOf" + s.ran + "' id='label" + newID + "'+s.ran style='display:none; position:fixed; left:" + labelLeft + "px; top:" + labelTop + "px; width: " + barWidth +  "px; z-index:100; text-align:center;'>" + textToDisplay + "</div>");  
-            }
-            
-            var fadeInSpeed = 'slow';
-            if (s.totalAnimationTime === 0)
-            {
-              fadeInSpeed = '0'; 
-            }
-            
-            var functionCall2 = "$('#label" + newID + "').fadeIn('" + fadeInSpeed + "')"; 
-            window.setTimeout(functionCall2, (s.totalAnimationTime)  );                 
-          }
+          
           
           
         },
@@ -767,24 +754,123 @@ function getSpanChart(title, id, labelID, axisTitleID)
         {
           ctx.clearRect(0, 0, canvas.width, canvas.height);            // clear canvas          
           var values = $('#'+id).text().split(",");                    // Get the values               
+	  var axisTitles = $('#'+ axisTitleID).text().split(",");  // Get the values 
           var xLabels = $('#'+labelID).text().split(",");          // Get the values 
           var topValue = Math.max.apply(Math, values);                 // Find the highest value          
-          var barWidth = ((s.totalWidth-5) / values.length) - s.gap;   // width of bars                 
+          var barWidth = (((s.totalWidth - s.axisHPadding - s.axisYSize -5) / values.length) - s.gap) ;   // width of bars                 
+          s.barWidth = barWidth;
           
-          
+          var bottomGraphPoint = Number(s.totalHeight) + padding - s.axisXSize;
+	  var leftGraphPoint = s.axisHPadding + s.axisYSize;
+	  
+          var topGap = 40;
           
           //DRAW elements                   
           var timeDiff = ((new Date().getTime() - startTime)) ;
           var totalHeight = (finalHeight) * ((timeDiff)/(s.totalAnimationTime));
           
           totalHeight = Math.min(totalHeight, finalHeight);           
-          var pxMult = totalHeight/topValue;                     // Pixel Multiplier              
+          var pxMult = ((totalHeight) - topGap - s.axisXSize)/topValue;                     // Pixel Multiplier
+          pxMult = Math.max(pxMult,0);
+          
+          var pxMultAbs = ((finalHeight) - topGap - s.axisXSize)/topValue;                     // Pixel Multiplier              
+          
           ctx.lineWidth = 2;
           ctx.strokeStyle = s.barBorderColor;               
           ctx.strokeStyle = s.tipColor;   
           
-          
-          
+	  
+	  
+	  
+	  
+	  ///////////////////////////////////////
+	  //Title
+	  ///////////////////////////////////////	  	  
+          ctx.fillStyle = s.titleColor;
+	  ctx.textAlign = 'center';
+	  ctx.font = s.tipSize + "px " + s.tipFont;
+	  ctx.fillText(title, (s.totalWidth/2), 20);
+	
+	  
+          ///////////////////////
+          // X-Axis
+          ///////////////////////  
+          if (s.showAxis)
+          {    
+            //Line
+	    ctx.beginPath();
+	    ctx.moveTo(leftGraphPoint, bottomGraphPoint );
+	    ctx.lineTo(s.totalWidth-s.gap, bottomGraphPoint );
+	    ctx.stroke();
+            
+            //Values    
+            var xLabels = $('#'+labelID).text().split(",");          // Get the values    
+            for (var Xi = 0; Xi < xLabels.length; Xi++)
+            {                                  
+              ctx.fillStyle = s.titleColor;
+	      ctx.textAlign = 'center';
+	      ctx.font = s.tipSize + "px " + s.tipFont;
+	      ctx.fillText(xLabels[Xi], (s.axisYSize + s.axisHPadding + (barWidth/2) + 2 + Xi*(s.gap + barWidth)), s.bottom - s.axisHPadding);	   	    
+            }
+            
+            //Title          
+            ctx.fillStyle = s.titleColor;
+	    ctx.textAlign = 'center';
+	    ctx.font = s.tipSize + "px " + s.tipFont;
+	    ctx.fillText(axisTitles[0], (s.totalWidth/2), 10 + s.bottom - s.axisHPadding);	   
+          }
+	  
+	  
+	  ///////////////////////
+          // Y-Axis
+          ///////////////////////
+          if (s.showAxis)
+          {
+            //Line
+	    ctx.beginPath();
+	    ctx.moveTo(leftGraphPoint, topGap);
+	    ctx.lineTo(leftGraphPoint, bottomGraphPoint);
+	    ctx.stroke();
+            
+            //Values
+            for (var Yi = 0; Yi <= topValue; Yi += s.YAxisSkip)
+            {
+              ctx.fillStyle = s.titleColor;
+	      ctx.textAlign = 'center';
+	      ctx.font = s.tipSize + "px " + s.tipFont;
+	      ctx.fillText(Yi, s.axisHPadding, bottomGraphPoint - (Yi* pxMultAbs)) ;
+	      
+              if (s.axisGrid)
+              {  		
+		ctx.beginPath();
+		ctx.moveTo(leftGraphPoint, bottomGraphPoint - (Yi* pxMultAbs) );
+		ctx.lineTo(s.totalWidth-s.gap, bottomGraphPoint - (Yi* pxMultAbs) );
+		ctx.stroke();
+              }
+            }
+          }
+	  
+	  
+	  ///////////////////////
+          //Data labels
+          ///////////////////////                    
+	  if (s.displayValues) 
+	  {            
+	    for (var i = 0; i < values.length; i++)
+	    {                         
+	      var labelLeft = (s.axisYSize + s.axisHPadding + (barWidth/2) + 2 + i*(s.gap + barWidth))
+              var labelTop = (bottomGraphPoint - (values[i] * pxMult))-5;
+              
+	      ctx.fillStyle = s.titleColor;
+	      ctx.textAlign = 'center';
+	      ctx.font = s.tipSize + "px " + s.tipFont;
+	      ctx.fillText(values[i], labelLeft, labelTop);	      	              
+	    }
+	  }
+	  
+	  
+	  
+	  
           ///////////////////////////////////////
           //Data bars
           ///////////////////////////////////////
@@ -800,9 +886,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
               var val = values[i];               
               var barHeight = (val * pxMult);            
               
-              var x1 = 2 + ((barWidth + s.gap) * i);
+              var x1 = s.axisHPadding + s.axisYSize + 2 + ((barWidth + s.gap) * i);
               var x2 = 2 + x1 + barWidth;
-              var y1 =  s.totalHeight + padding;
+              var y1 = (Number(s.totalHeight) + padding) - s.axisXSize;	      
               var y2 = y1 - (barHeight);
               
               
@@ -828,12 +914,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
               var grd = ctx.createLinearGradient(x1, y1, x1, y2);            
               grd.addColorStop(0,col1);                 
               grd.addColorStop(1,col2);                                                
-              ctx.fillStyle = grd;                             
-              
-              ctx.stroke();    
-              
-              ctx.fill();
-              
+              ctx.fillStyle = grd;                                           
+              ctx.stroke();                  
+              ctx.fill();              
             }
           }
           
@@ -844,22 +927,22 @@ function getSpanChart(title, id, labelID, axisTitleID)
           //Data Lines
           ///////////////////////////////////////
           if (s.showDataLines)
-          {            
+          {         
             ctx.beginPath();
-            ctx.moveTo((barWidth/2), (s.totalHeight + padding)  );
+            //ctx.moveTo((barWidth/2), (s.totalHeight + padding)  );
+	    ctx.moveTo((barWidth/2) + s.axisYSize + s.axisHPadding , bottomGraphPoint  );
             
+	    
+	    
             for (var i = 0; i < values.length; i++)
-            {               
-              
+            {                             
               var newID = "chartIDLine" + i + s.ran;
               var val = values[i];               
-              var barHeight = (val * pxMult);            
-              
+              var barHeight = (val * pxMult);                          
               
               //LINES
               if (s.showDataLines)
-              {
-                
+              {                
                 var starter = 1;
                 if (s.shadeUnder)
                 {
@@ -868,45 +951,73 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 
                 if (i >= starter)
                 {
-                  var y1 = (s.totalHeight + padding);
-                  var x1 = (barWidth/2) + ((barWidth + s.gap) * (i));     
-                  
+		  
+		  
                   if (i!==0)
-                  {
-                    y1 = (s.totalHeight + padding) - (values[i-1] * pxMult);
-                    x1 = (barWidth/2) + ((barWidth + s.gap) * (i-1));                  
+                  {		    
+                    y1 = (Number(s.totalHeight) + Number(padding)) - (values[i-1] * pxMult);
+                    x1 = (barWidth/2) + ((Number(barWidth) + Number(s.gap)) * (i-1));                  
+		    
                   }
-                  
-                  var x2 = (barWidth/2) + ((barWidth + s.gap) * i);                
-                  var y2 = (s.totalHeight + padding) - (barHeight);
-                  
+                
+		  
+		  var pxMult = ((totalHeight) - topGap - s.axisXSize)/topValue;                     // Pixel Multiplier              
+		  pxMult = Math.max(pxMult,0);
+		  var val = values[i];               
+		  var barHeight = (val * pxMult);            
+              
+		  //findme
+		  //(s.axisYSize + s.axisHPadding + (barWidth/2) + 2 + Xi*(s.gap + barWidth))
+		  //var x1 = s.axisHPadding + s.axisYSize + 2 + ((barWidth) * i) + barWidth/2;
+		  var x1 = s.axisYSize + s.axisHPadding + (barWidth/2) + (i-1) * (s.gap + barWidth);		 
+		  var x2 = x1 + barWidth + s.gap ;
+		  
+		  
+		  var y1 = 0;	//holder - gets changed below
+		  var y2 = 0;	//holder - gets changed below
+                
+ 		  if (i==starter && s.shadeUnder)
+		  {
+		    y1 = bottomGraphPoint ;
+		    y2 = bottomGraphPoint - (values[i] * pxMult);
+		  }
+		  else
+		  {		    
+		    y1 = bottomGraphPoint - (values[i-1] * pxMult);
+		    y2 = bottomGraphPoint - (values[i] * pxMult)
+		  }
+		  
+		  
                   var col1 = s.colorDecrease(s.colorStart, 40, values.length, i, s.barTransparency)
                   var col2 = col1;            
                   var grd = ctx.createLinearGradient(x1, y1, x1, y2);            
-                  grd.addColorStop(0,col1);                 
-                  grd.addColorStop(1,col2);                                                
+                  
+		  grd.addColorStop(0, col1);
+                  grd.addColorStop(1, col2);
                   ctx.fillStyle = grd;                 
-                  //ctx.beginPath();                
+                  
                   
                   if (!s.shadeUnder)
-                  {
+                  {		   		    
                     ctx.moveTo(x1, y1);
                   }
                   ctx.lineTo(x2, y2);
                   
                   if (i === values.length - 1 && (s.shadeUnder))
                   {
-                    ctx.lineTo(x2, (s.totalHeight + padding));                  
+		    ctx.lineTo(x2, bottomGraphPoint);                  
+		    ctx.closePath();
                   }
                   
                   ctx.stroke();    //Draw the line
-                }                                
+                }                     
               }              
             }
             
             if (s.shadeUnder)
             {
-              var grd = ctx.createLinearGradient(0, 0, 0, s.totalHeight);          
+              //var grd = ctx.createLinearGradient(0, 0, 0, s.totalHeight);
+	      var grd = ctx.createLinearGradient(0, 0, 0, bottomGraphPoint);          
               grd.addColorStop(0,s.colorStart);                 
               grd.addColorStop(1,s.colorDecrease(s.colorStart, 60, values.length, values.length, s.barTransparency));                   
               ctx.fillStyle = grd;                 
@@ -921,17 +1032,25 @@ function getSpanChart(title, id, labelID, axisTitleID)
           if (s.showCurveLines)
           {
             
+	    var pxMult = ((totalHeight) - topGap - s.axisXSize)/topValue;                     // Pixel Multiplier              
+	    pxMult = Math.max(pxMult,0);
+		  
             if (s.shadeUnder)
             {              
               ctx.beginPath();    
-              ctx.moveTo((barWidth/2), (s.totalHeight + padding) );                  
-              ctx.lineTo((barWidth/2), (s.totalHeight + padding) - (values[0] * pxMult));
+	      ctx.moveTo((barWidth/2) + s.axisYSize + s.axisHPadding , bottomGraphPoint);
+              
+	      ctx.lineTo((barWidth/2) + s.axisYSize + s.axisHPadding, bottomGraphPoint - (values[0] * pxMult));
+	      
+	      
+	      
               ctx.stroke();
             }
             
             for (var i = 0; i < values.length; i++)
             {           
               var newID = "chartIDCurve" + i + s.ran;
+	      
               var val = values[i];               
               var barHeight = (val * pxMult);            
               
@@ -948,8 +1067,28 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 var x2 = (barWidth/2) + ((barWidth + s.gap) * i);                
                 var y2 = (s.totalHeight + padding) - (barHeight);
                 
-                
-                
+		
+		
+		var x1 = s.axisYSize + s.axisHPadding + (barWidth/2) + (i-1) * (s.gap + barWidth);		 
+		var x2 = x1 + barWidth + s.gap ;
+		  
+		
+		var y1 = 0;	//holder - gets changed below
+		var y2 = 0;	//holder - gets changed below
+	      
+		if (i==starter && s.shadeUnder)
+		{
+		  y1 = bottomGraphPoint ;
+		  y2 = bottomGraphPoint - (values[i] * pxMult);
+		}
+		else
+		{		    
+		  y1 = bottomGraphPoint - (values[i-1] * pxMult);
+		  y2 = bottomGraphPoint - (values[i] * pxMult)
+		}
+		
+		
+		
                 if (!s.shadeUnder)
                 {
                   ctx.moveTo(x1, y1);
@@ -958,9 +1097,9 @@ function getSpanChart(title, id, labelID, axisTitleID)
                 
                 if (i === values.length - 1 && (s.shadeUnder))
                 {
-                  ctx.lineTo(x2, (s.totalHeight + padding));                  
+                  //ctx.lineTo(x2, (s.totalHeight + padding));
+		  ctx.lineTo(x2, bottomGraphPoint);                  
                 }
-                
                 
                 ctx.stroke();  
               }              
@@ -983,7 +1122,15 @@ function getSpanChart(title, id, labelID, axisTitleID)
           
           if (totalHeight < finalHeight)
           {
-            requestAnimationFrame(function(){s.animateBarsHTML5(ctx, canvas, finalHeight, padding, startTime);});           }          
+	    //Keep animating
+	    //findme
+	      requestAnimationFrame(function(){s.animateBarsHTML5(ctx, canvas, finalHeight, padding, startTime);});           	    
+	  } 
+	  else	    
+	  {
+	    //finalise
+	    
+	  }
         }                
       };
   return s;
